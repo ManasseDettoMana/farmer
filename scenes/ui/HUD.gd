@@ -13,6 +13,8 @@ var _points_label: Label
 var _market: Panel
 var _market_buttons: Array[Button] = []
 var _expand_btn: Button
+var _mute_btn: Button
+var _muted := false
 
 func _ready() -> void:
 	layer = 10
@@ -22,6 +24,7 @@ func _ready() -> void:
 	add_child(root)
 
 	_build_top_bar(root)
+	_build_audio_button(root)
 	_build_dashboard(root)
 	_build_market(root)
 
@@ -44,6 +47,26 @@ func _build_top_bar(root: Control) -> void:
 	_points_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_points_label.add_theme_font_size_override("font_size", 20)
 	panel.add_child(_points_label)
+
+# --- Audio mute toggle ------------------------------------------------------
+
+func _build_audio_button(root: Control) -> void:
+	_mute_btn = Button.new()
+	_mute_btn.anchor_left = 1.0
+	_mute_btn.anchor_right = 1.0
+	_mute_btn.offset_left = -66
+	_mute_btn.offset_right = -10
+	_mute_btn.offset_top = 10
+	_mute_btn.offset_bottom = 56
+	_mute_btn.text = "🔊"
+	_mute_btn.add_theme_font_size_override("font_size", 20)
+	_mute_btn.pressed.connect(_toggle_mute)
+	root.add_child(_mute_btn)
+
+func _toggle_mute() -> void:
+	_muted = not _muted
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), _muted)
+	_mute_btn.text = "🔇" if _muted else "🔊"
 
 # --- Bottom dashboard -------------------------------------------------------
 

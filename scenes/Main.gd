@@ -3,6 +3,7 @@ extends Node2D
 ## then handles camera pan/zoom, land click-bonus, the move tool and the fish action.
 
 const SKY := "res://assets/bg-sky.jpg"
+const MUSIC := "res://assets/audio/song1.mp3"
 const FISH_REWARD := 5.0
 const DRAG_THRESHOLD := 6.0
 
@@ -10,6 +11,7 @@ var camera: Camera2D
 var world: IsoWorld
 var hud: HUD
 var placement: PlacementController
+var music: AudioStreamPlayer
 
 var _panning := false
 var _drag_moved := 0.0
@@ -17,12 +19,13 @@ var _await_move := false
 
 func _ready() -> void:
 	_build_background()
-
+	_build_music()
+	
 	camera = Camera2D.new()
 	camera.position = Vector2(0, 96)
 	add_child(camera)
 	camera.make_current()
-
+	
 	world = IsoWorld.new()
 	add_child(world)
 	world.structure_clicked.connect(_on_structure_clicked)
@@ -41,6 +44,13 @@ func _ready() -> void:
 
 	_update_camera_limits()
 	GameState.economy_changed.connect(_update_camera_limits)
+
+func _build_music() -> void:
+	# Looping background music (loop is enabled in song1.mp3.import).
+	music = AudioStreamPlayer.new()
+	music.stream = load(MUSIC)
+	add_child(music)
+	music.play()
 
 func _build_background() -> void:
 	var layer := CanvasLayer.new()
